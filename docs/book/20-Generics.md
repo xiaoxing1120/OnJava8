@@ -349,7 +349,7 @@ public class RandomList<T> extends ArrayList<T> {
   
     public static void main(String[] args) {
         RandomList<String> rs = new RandomList<>();
-        Array.stream("The quick brown fox jumped over the lazy brown dog".split(" ")).forEach(rs::add);
+        Arrays.stream("The quick brown fox jumped over the lazy brown dog".split(" ")).forEach(rs::add);
         IntStream.range(0, 11).forEach(i -> 
             System.out.print(rs.select() + " "));
     }
@@ -1090,7 +1090,7 @@ Serializable]
 */
 ```
 
-在第十二章 [集合的本章小节](book/12-Collections.md#本章小结) 部分将会用到这里的输出结果。
+在第十二章 [集合的本章小结](book/12-Collections.md#本章小结) 部分将会用到这里的输出结果。
 
 <!-- Building Complex Models -->
 
@@ -1292,6 +1292,7 @@ public class LostInformation {
 [K,V]
 [Q]
 [POSITION,MOMENTUM]
+*/
 ```
 
 根据 JDK 文档，**Class.getTypeParameters()** “返回一个 **TypeVariable** 对象数组，表示泛型声明中声明的类型参数...” 这暗示你可以发现这些参数类型。但是正如上例中输出所示，你只能看到用作参数占位符的标识符，这并非有用的信息。
@@ -1409,7 +1410,7 @@ class Manipulator3 {
     private HasF obj;
     
     Manipulator3(HasF x) {
-        ojb = x;
+        obj = x;
     }
     
     public void manipulate() {
@@ -1595,7 +1596,7 @@ import java.util.function.*;
 import onjava.*;
 
 public class FilledList<T> extends ArrayList<T> {
-    FilledList<Supplier<T> gen, int size) {
+    FilledList(Supplier<T> gen, int size) {
         Suppliers.fill(this, gen, size);
     }
     
@@ -1616,6 +1617,7 @@ public class FilledList<T> extends ArrayList<T> {
 /* Output:
 [Hello,Hello,Hello,Hello]
 [47,47,47,47]
+*/
 ```
 
 即使编译器无法得知 `add()` 中的 **T** 的任何信息，但它仍可以在编译期确保你放入 **FilledList** 中的对象是 **T** 类型。因此，即使擦除移除了方法或类中的实际类型的信息，编译器仍可以确保方法或类中使用的类型的内部一致性。
@@ -2636,7 +2638,7 @@ public class NonCovariantGenerics {
 }
 ```
 
-尽管你在首次阅读这段代码时会认为“不能将一个 **Apple** 集合赋值给一个 **Fruit** 集合”。记住，泛型不仅仅是关于集合，它真正要表达的是“不能把一个涉及 **Apple** 的泛型赋值给一个涉及 **Fruit** 的泛型”。如果像在数组中的情况一样，编译器对代码的了解足够多，可以确定所涉及到的集合，那么它可能会留下一些余地。但是它不知道任何有关这方面的信息，因此它拒绝向上转型。然而实际上这也不是向上转型—— **Apple** 的 **List** 不是 **Fruit** 的 **List**。**Apple** 的 **List** 将持有 **Apple** 和 **Apple** 的子类型，**Fruit** 的 **List** 将持有任何类型的 **Fruit**。是的，这包括 **Apple**，但是它不是一个 **Apple** 的 **List**，它仍然是 **Fruit** 的 **List**。**Apple** 的 **List** 在类型上不等价于 **Fruit** 的 **List**，即使 **Apple** 是一种 **Fruit** 类型。
+尽管你在首次阅读这段代码时会认为“不能将一个 **Apple** 集合赋值给一个 **Fruit** 集合”。记住，泛型不仅仅是关于集合，它真正要表达的是“不能把一个涉及 **Apple** 的泛型赋值给一个涉及 **Fruit** 的泛型”。如果像在数组中的情况一样，编译器对代码的了解足够多，可以确定所涉及到的集合，那么它可能会留下一些余地。但是它不知道任何有关这方面的信息，因此它拒绝向上转型。然而实际上这也不是向上转型—— **Apple** 的 **List** 不是 **Fruit** 的 **List**。**Apple** 的 **List** 将持有 **Apple** 和 **Apple** 的子类型，**Fruit** 的 **List** 将持有任何类型的 **Fruit**。是的，这包括 **Apple**，但是它不是一个 **Apple** 的 **List**，它仍然是 **Fruit** 的 **List**。**Apple** 的 **List** 在类型上不等价于 **Fruit** 的 **List**，即使 **Apple** 是一种 **Fruit** 类型。
 
 真正的问题是我们在讨论的集合类型，而不是集合持有对象的类型。与数组不同，泛型没有内建的协变类型。这是因为数组是完全在语言中定义的，因此可以具有编译期和运行时的内建检查，但是在使用泛型时，编译器和运行时系统不知道你想用类型做什么，以及应该采用什么规则。
 
@@ -2702,6 +2704,8 @@ public class CompilerIntelligence {
 下面展示一个简单的 **Holder** 类：
 
 ```java
+// generics/Holder.java
+
 public class Holder<T> {
 
     private T value;
@@ -2734,7 +2738,7 @@ public class Holder<T> {
         Holder<Apple> apple = new Holder<>(new Apple());
         Apple d = apple.get();
         apple.set(d);
-//        Holder<Fruit> fruit = apple; // Cannot upcast
+        // Holder<Fruit> fruit = apple; // Cannot upcast
         Holder<? extends Fruit> fruit = apple; // OK
         Fruit p = fruit.get();
         d = (Apple) fruit.get();
@@ -2743,8 +2747,8 @@ public class Holder<T> {
         } catch (Exception e) {
             System.out.println(e);
         }
-//        fruit.set(new Apple()); // Cannot call set()
-//        fruit.set(new Fruit()); // Cannot call set()
+        // fruit.set(new Apple()); // Cannot call set()
+        // fruit.set(new Fruit()); // Cannot call set()
         System.out.println(fruit.equals(d)); // OK
     }
 }
@@ -2754,7 +2758,7 @@ false
 */
 ```
 
-**Holder** 有一个接受 **T** 类型对象的 `set()` 方法，一个返回 T 对象的 `get()` 方法和一个接受 Object 对象的 `equals()` 方法。正如你所见，如果创建了一个 `Holder<Apple>`，就不能将其向上转型为 `Holder<Fruit>`，但是可以向上转型为 `Holder<? extends Fruit>`。如果调用 `get()`，只能返回一个 **Fruit**——这就是在给定“任何；额扩展自 **Fruit** 的对象”这一边界后，它所能知道的一切了。如果你知道更多的信息，就可以将其转型到某种具体的 **Fruit** 而不会导致任何警告，但是存在得到 **ClassCastException** 的风险。`set()` 方法不能工作在 **Apple** 和 **Fruit** 上，因为 `set()` 的参数也是"**? extends Fruit**"，意味着它可以是任何事物，编译器无法验证“任何事物”的类型安全性。
+**Holder** 有一个接受 **T** 类型对象的 `set()` 方法，一个返回 T 对象的 `get()` 方法和一个接受 Object 对象的 `equals()` 方法。正如你所见，如果创建了一个 `Holder<Apple>`，就不能将其向上转型为 `Holder<Fruit>`，但是可以向上转型为 `Holder<? extends Fruit>`。如果调用 `get()`，只能返回一个 **Fruit**——这就是在给定“任何扩展自 **Fruit** 的对象”这一边界后，它所能知道的一切了。如果你知道更多的信息，就可以将其转型到某种具体的 **Fruit** 而不会导致任何警告，但是存在得到 **ClassCastException** 的风险。`set()` 方法不能工作在 **Apple** 和 **Fruit** 上，因为 `set()` 的参数也是"**? extends Fruit**"，意味着它可以是任何事物，编译器无法验证“任何事物”的类型安全性。
 
 但是，`equals()` 方法可以正常工作，因为它接受的参数是 **Object** 而不是 **T** 类型。因此，编译器只关注传递进来和要返回的对象类型。它不会分析代码，以查看是否执行了任何实际的写入和读取操作。
 
@@ -3323,7 +3327,7 @@ Double
 ```
 
 `f1()` 中的类型参数都是确切的，没有通配符或边界。在 `f2()` 中，**Holder** 参数是一个无界通配符，因此它看起来是未知的。但是，在 `f2()` 中调用了 `f1()`，而 `f1()` 需要一个已知参数。这里所发生的是：在调用 `f2()` 的过程中捕获了参数类型，并在调用 `f1()` 时使用了这种类型。
-你可能想知道这项技术是否可以用于写入，但是这要求在传递 `Holder<?>` 时同时传递一个具体类型。捕获转换只有在这样的情况下可以工作：即在方法内部，你需要使用确切的类型。注意，不能从 `f2()` 中返回 **T**，因为 **T ** 对于 `f2()` 来说是未知的。捕获转换十分有趣，但是非常受限。
+你可能想知道这项技术是否可以用于写入，但是这要求在传递 `Holder<?>` 时同时传递一个具体类型。捕获转换只有在这样的情况下可以工作：即在方法内部，你需要使用确切的类型。注意，不能从 `f2()` 中返回 **T**，因为 **T** 对于 `f2()` 来说是未知的。捕获转换十分有趣，但是非常受限。
 
 <!-- Issues -->
 
@@ -3582,7 +3586,7 @@ public class UseList<W, T> {
 }
 ```
 
-因为擦除，所以重载方法产生了的类型签名。
+因为擦除，所以重载方法产生了相同的类型签名。
 
 因而，当擦除后的参数不能产生唯一的参数列表时，你必须提供不同的方法名：
 
